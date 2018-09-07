@@ -52,7 +52,10 @@ object Main extends App {
 
     opt[String]('o', "operation")
       .action( (x, c) => c.copy(operation = x) ).text("operation name to use for the test span")
+
+    help("help").text("prints usage text")
   }
+
   parser.parse(args, Config()) match {
     case Some(config) => {
       val protocol = if (config.secure) "https" else "http"
@@ -73,12 +76,11 @@ object Main extends App {
       span.log("Lorem Ipsum Dolor")
       span.finish
       tracer.flush(4000)
-      System.exit(0)
     }
 
     case None =>
-      println("Provided un-parseable options.")
-      System.exit(1)
     // arguments are bad, error message will have been displayed
   }
+
+  sys.exit(0)
 }

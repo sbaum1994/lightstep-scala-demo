@@ -3,6 +3,7 @@ scalaVersion := "2.12.6"
 name := "scala-example"
 organization := "lightstep"
 version := "1.0"
+fork in run := true
 
 libraryDependencies += "org.typelevel" %% "cats-core" % "1.1.0"
 libraryDependencies += "io.netty" % "netty-tcnative-boringssl-static" % "2.0.12.Final"
