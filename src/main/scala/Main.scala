@@ -5,15 +5,16 @@ import java.util
 import scopt.OptionParser
 
 case class Config(
-                 accessToken: String = "", // access token to use when reporting spans
-                 host: String = "collector-grpc.lightstep.com", // hostname of the collector to which reports should be sent
-                 port: Int = -1, // port of the collector to which reports should be sent
-                 secure: Boolean = true, // whether or not to use TLS
-                 operation: String = "test-operation" // operation name to use for the test span
+                 accessToken: String = "",
+                 host: String = "collector-grpc.lightstep.com",
+                 port: Int = -1,
+                 secure: Boolean = true,
+                 service: String = "test-service",
+                 operation: String = "test-operation",
+                 verbosity: Int = 4
                  )
 
 object Main extends App {
-
   /* this is an example of logging a large stack trace/long log that would normally get cut off in LightStep's UI
 
   val span = tracer.buildSpan("chunked-logs").startManual
@@ -50,8 +51,14 @@ object Main extends App {
     opt[Boolean]('s', "secure")
         .action( (x, c) => c.copy(secure = x) ).text("whether or not to use TLS")
 
+    opt[String]('r', "service")
+      .action( (x, c) => c.copy(service = x) ).text("service to make this trace under")
+
     opt[String]('o', "operation")
-      .action( (x, c) => c.copy(operation = x) ).text("operation name to use for the test span")
+      .action( (x, c) => c.copy(operation = x) ).text("operation name to use for the test span, if you specify a trace def file, that will override this setting")
+
+    opt[Int]('v', "verbosity")
+        .action( (x, c) => c.copy(verbosity = x) ).text("tracer logging verbosity")
 
     help("help").text("prints usage text")
   }
@@ -67,7 +74,8 @@ object Main extends App {
         .withCollectorPort(port)
         .withCollectorProtocol(protocol)
         .withDisableReportingLoop(true)
-        .withVerbosity(4)
+        .withComponentName(config.service)
+        .withVerbosity(config.verbosity)
         .build
 
       val tracer: JRETracer = new JRETracer(options)
